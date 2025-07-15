@@ -25,3 +25,9 @@ exclude_patterns = []
 
 html_theme = 'bizstyle'
 html_static_path = ['_static']
+
+# multi-language docs
+language = 'en'
+locale_dirs = ['../locales/']   # path is example but recommended.
+gettext_compact = False  # optional.
+gettext_uuid = True  # optional.
