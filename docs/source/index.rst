@@ -5,11 +5,10 @@
 
 xense documentation
 ===================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+**Lumache**(/lu'make/) is a python library
+`open food database`and you can also `open food library<https://world.openfoodfacts.org/>`,there's a *simple* and *intuitive* API
+.. note::
+   This project is under active development
 
 .. toctree::
    :maxdepth: 2
