@@ -31,3 +31,6 @@ language = 'en'
 locale_dirs = ['../locales/']   # path is example but recommended.
 gettext_compact = False  # optional.
 gettext_uuid = True  # optional.
+
+# EPUB options
+epub_show_urls = 'footnote'
