@@ -33,5 +33,5 @@ msgid ""
 "`reStructuredText <https://www.sphinx-"
 "doc.org/en/master/usage/restructuredtext/index.html>`_ documentation for "
 "details."
-msgstr ""
+msgstr "翻译了么"
 
