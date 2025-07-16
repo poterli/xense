@@ -13,13 +13,15 @@ xense
 
 最新的开发工具和XenseStudio使用说明如下：
 
-   :XenseStudio_: ../locales\zh_CN/LC_MESSAGES/xense.pot
-**文档管理** (/lu'make/) is a python library
-`open food database` and you can also `open food library<https://world.openfoodfacts.org/>`,there's a *simple* and *intuitive* API
+XenseStudio_: XenseStudio使用文档
 
-.. note::
-   This project is under active development
-   and the API may change in future releases.
+XenseSDK_: Xense SDK开发工具包说明
+
+.. _XenseStudio: /XenseStudio/XenseStudio.rst
+.. _XenseSDK: /XenseSDK/XenseSDK.rst
+
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
