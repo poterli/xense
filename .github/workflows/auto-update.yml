@@ -1,0 +1,37 @@
+name: 镜像更新后自动部署到服务器
+on:
+  # 监听镜像包的发布事件（当推新镜像到 GHCR 时触发）
+  registry_package:
+    types: [published]
+    # 可选：只监听特定镜像包（如果仓库有多个包）
+    package_types: [container]
+    packages:
+      - name: xense
+        owner: poterli
+
+jobs:
+  deploy-to-server:
+    runs-on: ubuntu-latest
+    steps:
+      # 步骤 1：提取镜像版本标签（比如 v1.0.1）
+      - name: 提取镜像标签
+        id: extract-tag
+        run: |
+          # 从事件中获取镜像版本（GitHub 会自动注入环境变量）
+          echo "TAG_NAME=${{ github.event.package.version }}" >> $GITHUB_OUTPUT
+
+      # 步骤 2：SSH 连接服务器，执行更新脚本
+      - name: SSH 执行更新
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          # 服务器的公网 IP（在 GitHub Secrets 中配置）
+          host: ${{ secrets.SERVER_IP }}  
+          # 服务器登录用户（在 GitHub Secrets 中配置）
+          username: ${{ secrets.SERVER_USER }}  
+          # 服务器的 SSH 私钥（在 GitHub Secrets 中配置）
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  
+          # 执行的命令：切换到脚本目录，运行更新脚本并传入标签
+          script: |
+            cd /path/to/your/server/scripts
+            # 传入镜像标签给脚本
+            NEW_TAG=${{ steps.extract-tag.outputs.TAG_NAME }} ./update-xense.sh  
