@@ -1,37 +1,38 @@
-name: 镜像更新后自动部署到服务器
+# 工作流名称
+name: 构建镜像并更新服务器
+
+# 触发条件：推送到 main 分支时运行
 on:
-  # 监听镜像包的发布事件（当推新镜像到 GHCR 时触发）
-  registry_package:
-    types: [published]
-    # 可选：只监听特定镜像包（如果仓库有多个包）
-    package_types: [container]
-    packages:
-      - name: xense
-        owner: poterli
+  push:
+    branches: [ "main" ]
 
 jobs:
-  deploy-to-server:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # 步骤 1：提取镜像版本标签（比如 v1.0.1）
-      - name: 提取镜像标签
-        id: extract-tag
-        run: |
-          # 从事件中获取镜像版本（GitHub 会自动注入环境变量）
-          echo "TAG_NAME=${{ github.event.package.version }}" >> $GITHUB_OUTPUT
+      # 步骤1：拉取代码
+      - uses: actions/checkout@v4
 
-      # 步骤 2：SSH 连接服务器，执行更新脚本
-      - name: SSH 执行更新
-        uses: appleboy/ssh-action@v1.0.0
+      # 步骤2：登录到镜像仓库（如 GitHub Container Registry）
+      - name: 登录到 GHCR
+        uses: docker/login-action@v3
         with:
-          # 服务器的公网 IP（在 GitHub Secrets 中配置）
-          host: ${{ secrets.SERVER_IP }}  
-          # 服务器登录用户（在 GitHub Secrets 中配置）
-          username: ${{ secrets.SERVER_USER }}  
-          # 服务器的 SSH 私钥（在 GitHub Secrets 中配置）
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  
-          # 执行的命令：切换到脚本目录，运行更新脚本并传入标签
-          script: |
-            cd /path/to/your/server/scripts
-            # 传入镜像标签给脚本
-            NEW_TAG=${{ steps.extract-tag.outputs.TAG_NAME }} ./update-xense.sh  
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 步骤3：构建并推送新镜像（以 darwin-amd64 为例）
+      - name: 构建并推送镜像
+        run: |
+          docker build -t ghcr.io/poterli/xense1:darwin-amd64 .
+          docker push ghcr.io/poterli/xense1:darwin-amd64
+          docker build -t ghcr.io/poterli/xense2:darwin-amd64 .
+          docker push ghcr.io/poterli/xense2:darwin-amd64
+
+      # 步骤4：触发远程服务器更新（就是你提到的这段代码）
+      - name: 触发远程服务器更新容器
+        run: |
+          # 通过 SSH 登录服务器，执行 Watchtower 立即更新
+          ssh user@your-server "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once arm64 darwin-amd64"
+        # 注意：需要在 GitHub 仓库设置中配置 SSH 密钥（见下方说明）
+    
